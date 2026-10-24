@@ -87,6 +87,8 @@ TestResults/
 
 ### 3.2 引入依赖
 
+> 依赖清单与维护说明见 `docs/DEPENDENCIES.md`。
+
 **做什么**
 
 - [ ] `MyMCLauncher.csproj` 添加：
