@@ -1,0 +1,52 @@
+# ===== 构建产物 =====
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Aa]rtifacts/
+[Pp]ublish/
+
+# ===== Visual Studio =====
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.rsuser
+
+# ===== Rider / VS Code =====
+.idea/
+.vscode/
+*.sln.iml
+
+# ===== 测试与覆盖率 =====
+[Tt]est[Rr]esult*/
+TestResults/
+*.trx
+*.coverage
+coverage*.json
+coverage*.xml
+coverage*.info
+
+# ===== NuGet =====
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+project.lock.json
+
+# ===== ReSharper =====
+_ReSharper*/
+*.DotSettings.user
+
+# ===== 发布与日志 =====
+*.publishsettings
+PublishScripts/
+*.binlog
+*.log
+
+# ===== 临时文件 =====
+*.tmp
+*.bak
+*.swp
+*~
