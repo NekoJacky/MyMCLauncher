@@ -3,6 +3,7 @@
 > 配套文档：`docs/M1-WORKFLOW.md`（P0）、`docs/PLAN.md`（§4.1、§4.7）
 > 阶段目标：项目可构建、可运行，具备后续所有阶段依赖的公共能力
 > 预计工作量：0.5 人日
+> 当前状态：主体已完成（`feat/p0-project-foundation`）；WebView2 依赖待合并（`feat/引入依赖`）
 
 ---
 
@@ -49,10 +50,10 @@ P0 结束后，应具备：
 
 ## 2. 前置检查
 
-- [ ] `dotnet --version` 为 `10.0.x`
-- [ ] WebView2 Runtime 已安装（开发机已确认）
-- [ ] NuGet 源可用（当前环境会重定向至 `nuget.azure.cn`，以实际 restore 为准）
-- [ ] 确认当前工程可构建：`dotnet build`
+- [x] `dotnet --version` 为 `10.0.x`
+- [x] WebView2 Runtime 已安装（开发机已确认）
+- [x] NuGet 源可用（当前环境会重定向至 `nuget.azure.cn`，以实际 restore 为准）
+- [x] 确认当前工程可构建：`dotnet build`
 
 ---
 
@@ -62,9 +63,9 @@ P0 结束后，应具备：
 
 **做什么**
 
-- [ ] `git init`
-- [ ] 新增 `.gitignore`
-- [ ] 首次提交（仅现有脚手架 + `.gitignore`）
+- [x] `git init`
+- [x] 新增 `.gitignore`
+- [x] 首次提交（仅现有脚手架 + `.gitignore`）
 
 **`.gitignore` 内容**
 
@@ -86,6 +87,8 @@ TestResults/
 ---
 
 ### 3.2 引入依赖
+
+> 状态：依赖改动位于 `feat/引入依赖` 分支，尚未合并；按计划在 P6 使用前合并即可。
 
 **做什么**
 
@@ -114,8 +117,8 @@ TestResults/
 
 **做什么**
 
-- [ ] 创建目录：`Models/`、`Services/`、`Services/Auth/`、`Minecraft/`、`Views/`、`Assets/`
-- [ ] 统一命名空间：
+- [x] 创建目录：`Models/`、`Services/`、`Services/Auth/`、`Minecraft/`、`Views/`、`Assets/`
+- [x] 统一命名空间：
   - `MyMCLauncher.Models`
   - `MyMCLauncher.Services`
   - `MyMCLauncher.Services.Auth`
@@ -283,11 +286,11 @@ public sealed class LogService : IDisposable
 
 **做什么**
 
-- [ ] `App.OnStartup` 注册：
+- [x] `App.OnStartup` 注册：
   - `DispatcherUnhandledException`
   - `AppDomain.CurrentDomain.UnhandledException`
   - `TaskScheduler.UnobservedTaskException`
-- [ ] 统一处理逻辑：
+- [x] 统一处理逻辑：
   1. `LogService.Error(...)` 写入异常
   2. `Flush()`
   3. `MessageBox.Show` 展示简要信息 + 日志路径
@@ -399,7 +402,7 @@ OnExit:
 - [ ] 新建 `MyMCLauncher.Tests`（xUnit）
 - [ ] 覆盖 `AppPaths` 路径拼接、`JsonStore` 容错/原子写入、`LogService` 并发写入
 
-> 若 P0 时间紧，可推迟到 P3 前，与规则/参数解析的测试一起补。
+> 状态：未创建测试项目；已用临时控制台对 `AppPaths`、`JsonStore`、`LogService` 做运行时验证。可推迟到 P3 前，与规则/参数解析的测试一起补。
 
 ---
 
@@ -428,16 +431,16 @@ OnExit:
 
 ## 5. 自测清单（P0 门禁）
 
-- [ ] `dotnet build` 0 error
-- [ ] 启动后 4 个目录自动创建
-- [ ] 日志文件生成，内容包含启动信息
-- [ ] 日志面板实时显示且不卡顿
-- [ ] 日志超过 1000 条时旧条目被裁剪
-- [ ] 非法 JSON 文件被备份为 `.corrupt-*`，程序继续运行
-- [ ] 人为抛出 UI 异常：弹窗 + 日志 + 退出
-- [ ] 人为抛出 Task 异常：日志记录，进程不崩溃
-- [ ] 关闭程序后日志已落盘
-- [ ] `git status` 干净（构建产物未入库）
+- [x] `dotnet build` 0 error
+- [x] 启动后 4 个目录自动创建
+- [x] 日志文件生成，内容包含启动信息
+- [x] 日志面板实时显示且不卡顿
+- [x] 日志超过 1000 条时旧条目被裁剪
+- [x] 非法 JSON 文件被备份为 `.corrupt-*`，程序继续运行
+- [ ] 人为抛出 UI 异常：弹窗 + 日志 + 退出（代码已实现，未手工触发）
+- [ ] 人为抛出 Task 异常：日志记录，进程不崩溃（代码已实现，未手工触发）
+- [x] 关闭程序后日志已落盘
+- [x] `git status` 干净（构建产物未入库）
 
 ---
 
@@ -472,4 +475,4 @@ chore(P0): bootstrap project skeleton, paths, json store, logging and global err
 
 **P0 完成标志**
 
-P0 自测清单全部通过，且 `docs/PLAN.md` §4.1 对应任务已勾选。
+P0 自测清单通过（未手工验证项见 §5 注），且 `docs/PLAN.md` §4.1 对应任务已勾选；`feat/引入依赖` 合并后视为完全完成。
