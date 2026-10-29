@@ -1,7 +1,7 @@
 # MyMCLauncher 开发规划文档
 
 > 版本：v0.5
-> 状态：M1 进行中（P0 主体完成，WebView2 依赖待合并）
+> 状态：M1 进行中（P0 已完成）
 > 范围：M1 启动功能（正版/离线登录、游戏目录选择、启动本地已安装版本）
 > 配套文档：`docs/M1-WORKFLOW.md`（M1 实施流程规划）
 > 登录方案：系统浏览器 + 本地回环（默认），WebView2 兜底
@@ -20,7 +20,7 @@
 | 本地 Minecraft | `%APPDATA%\.minecraft` 仅有 `runtime`（无 `versions`/`assets`/`libraries`） |
 | 本地 Java | 无全局 Java；仅有 Mojang 运行时 `runtime/java-runtime-epsilon`（OpenJDK 25） |
 
-**结论**：P0 基础设施主体已完成，进入 P1（设置、游戏目录、Java 检测）。
+**结论**：P0 已完成，进入 P1（设置、游戏目录、Java 检测）。
 
 ---
 
@@ -108,14 +108,12 @@ MyMCLauncher/
 
 ### 4.1 基础设施
 
-- [ ] 引入 `Microsoft.Web.WebView2` 包
+- [x] 引入 `Microsoft.Web.WebView2` 包
 - [x] `AppPaths`：配置目录 `%APPDATA%\MyMCLauncher\`、日志目录 `logs\`
 - [x] `JsonStore`：统一读写 + 容错（损坏时备份并重建）
 - [x] `LogService`：内存环形日志 + 落盘 + UI 实时推送
 - [x] 全局异常捕获（`DispatcherUnhandledException` / `TaskScheduler.UnobservedTaskException`）
 - [x] 使用 WPF 原生事件处理与数据绑定（不引入 MVVM 框架）
-
-> 说明：`Microsoft.Web.WebView2` 依赖改动位于 `feat/引入依赖` 分支，待 P6 使用前合并。
 
 ### 4.2 设置与路径
 
@@ -225,7 +223,7 @@ MyMCLauncher/
 
 M1 按 8 个阶段推进，每个阶段要求「可构建、可验证、可回退」。详细拆解见 `docs/M1-WORKFLOW.md`；阶段细化文档：P0 → `docs/P0-FOUNDATION.md`。
 
-> 进度：P0 主体完成（WebView2 依赖待合并），P1 未开始。
+> 进度：P0 已完成，P1 未开始。
 
 | 阶段 | 内容 | 主要产出 | 对应任务 | 依赖 |
 |------|------|----------|----------|------|

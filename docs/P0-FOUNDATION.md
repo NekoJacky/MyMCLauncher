@@ -3,7 +3,7 @@
 > 配套文档：`docs/M1-WORKFLOW.md`（P0）、`docs/PLAN.md`（§4.1、§4.7）
 > 阶段目标：项目可构建、可运行，具备后续所有阶段依赖的公共能力
 > 预计工作量：0.5 人日
-> 当前状态：主体已完成（`feat/p0-project-foundation`）；WebView2 依赖待合并（`feat/引入依赖`）
+> 当前状态：P0 已完成
 
 ---
 
@@ -88,11 +88,12 @@ TestResults/
 
 ### 3.2 引入依赖
 
-> 状态：依赖改动位于 `feat/引入依赖` 分支，尚未合并；按计划在 P6 使用前合并即可。
+> 依赖清单与维护说明见 `docs/DEPENDENCIES.md`。
+> 状态：依赖已引入（`Microsoft.Web.WebView2` 1.0.4314.35），P6 作为系统浏览器登录的兜底方案使用。
 
 **做什么**
 
-- [ ] `MyMCLauncher.csproj` 添加：
+- [x] `MyMCLauncher.csproj` 添加：
 
 ```xml
 <ItemGroup>
@@ -100,8 +101,8 @@ TestResults/
 </ItemGroup>
 ```
 
-- [ ] `dotnet restore`（或直接 `dotnet build`）
-- [ ] 确认 `obj/project.assets.json` 中包含该包
+- [x] `dotnet restore`（或直接 `dotnet build`）
+- [x] 确认 `obj/project.assets.json` 中包含该包
 
 **注意**
 
@@ -475,4 +476,4 @@ chore(P0): bootstrap project skeleton, paths, json store, logging and global err
 
 **P0 完成标志**
 
-P0 自测清单通过（未手工验证项见 §5 注），且 `docs/PLAN.md` §4.1 对应任务已勾选；`feat/引入依赖` 合并后视为完全完成。
+P0 自测清单通过（未手工验证项见 §5 注），且 `docs/PLAN.md` §4.1 对应任务已勾选。
