@@ -80,16 +80,18 @@ P0 工程骨架
 
 **前置**：无。
 
+> 状态：主体已完成（`feat/p0-project-foundation`）；WebView2 依赖待合并（`feat/引入依赖`）。
+
 **任务**
 
-- [ ] `git init` + `.gitignore`（`bin/`、`obj/`、`.vs/`），每阶段结束提交一次
+- [x] `git init` + `.gitignore`（`bin/`、`obj/`、`.vs/`），每阶段结束提交一次
 - [ ] 引入 `Microsoft.Web.WebView2` 包
-- [ ] 创建目录：`Models/`、`Services/`、`Services/Auth/`、`Minecraft/`、`Views/`、`Assets/`
-- [ ] `AppPaths`：配置目录、日志目录、natives 目录
-- [ ] `JsonStore`：读写 + 损坏备份 + 默认值
-- [ ] `LogService`：内存日志、文件日志、UI 事件
-- [ ] 全局异常捕获与统一错误提示
-- [ ] 主窗口最小壳（标题、日志面板占位）
+- [x] 创建目录：`Models/`、`Services/`、`Services/Auth/`、`Minecraft/`、`Views/`、`Assets/`
+- [x] `AppPaths`：配置目录、日志目录、natives 目录
+- [x] `JsonStore`：读写 + 损坏备份 + 默认值
+- [x] `LogService`：内存日志、文件日志、UI 事件
+- [x] 全局异常捕获与统一错误提示
+- [x] 主窗口最小壳（标题、日志面板占位）
 
 **产出**：可运行的空壳程序，启动后生成配置与日志目录。
 
@@ -523,7 +525,7 @@ P0 工程骨架
 
 ## 10. 执行清单（按顺序）
 
-- [ ] P0 工程骨架与基础设施
+- [x] P0 工程骨架与基础设施（WebView2 依赖待合并）
 - [ ] P1 设置、游戏目录、Java 检测
 - [ ] P2 离线账号与账号管理
 - [ ] P3 版本扫描与继承解析

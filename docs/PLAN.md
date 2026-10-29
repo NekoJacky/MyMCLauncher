@@ -1,7 +1,7 @@
 # MyMCLauncher 开发规划文档
 
-> 版本：v0.4
-> 状态：M1 方案已确认（P6 登录方案已更新）
+> 版本：v0.5
+> 状态：M1 进行中（P0 主体完成，WebView2 依赖待合并）
 > 范围：M1 启动功能（正版/离线登录、游戏目录选择、启动本地已安装版本）
 > 配套文档：`docs/M1-WORKFLOW.md`（M1 实施流程规划）
 > 登录方案：系统浏览器 + 本地回环（默认），WebView2 兜底
@@ -15,12 +15,12 @@
 | 项目类型 | WPF 桌面应用（`WinExe`） |
 | 目标框架 | `net10.0-windows` |
 | 语言特性 | C#、`Nullable`、`ImplicitUsings` 开启 |
-| 现有文件 | `App.xaml`、`MainWindow.xaml`（空白 Grid）、`AssemblyInfo.cs`、`MyMCLauncher.slnx` |
+| 现有文件 | WPF 入口 + `Models/`、`Services/`（AppPaths / JsonStore / LogService / AppHost）+ `docs/` |
 | 开发环境 | .NET SDK 10.0.401，WebView2 Runtime 已安装 |
 | 本地 Minecraft | `%APPDATA%\.minecraft` 仅有 `runtime`（无 `versions`/`assets`/`libraries`） |
 | 本地 Java | 无全局 Java；仅有 Mojang 运行时 `runtime/java-runtime-epsilon`（OpenJDK 25） |
 
-**结论**：项目处于脚手架阶段，尚未有任何业务逻辑。M1 从零开始实现。
+**结论**：P0 基础设施主体已完成，进入 P1（设置、游戏目录、Java 检测）。
 
 ---
 
@@ -109,11 +109,13 @@ MyMCLauncher/
 ### 4.1 基础设施
 
 - [ ] 引入 `Microsoft.Web.WebView2` 包
-- [ ] `AppPaths`：配置目录 `%APPDATA%\MyMCLauncher\`、日志目录 `logs\`
-- [ ] `JsonStore`：统一读写 + 容错（损坏时备份并重建）
-- [ ] `LogService`：内存环形日志 + 落盘 + UI 实时推送
-- [ ] 全局异常捕获（`DispatcherUnhandledException` / `TaskScheduler.UnobservedTaskException`）
-- [ ] 使用 WPF 原生事件处理与数据绑定（不引入 MVVM 框架）
+- [x] `AppPaths`：配置目录 `%APPDATA%\MyMCLauncher\`、日志目录 `logs\`
+- [x] `JsonStore`：统一读写 + 容错（损坏时备份并重建）
+- [x] `LogService`：内存环形日志 + 落盘 + UI 实时推送
+- [x] 全局异常捕获（`DispatcherUnhandledException` / `TaskScheduler.UnobservedTaskException`）
+- [x] 使用 WPF 原生事件处理与数据绑定（不引入 MVVM 框架）
+
+> 说明：`Microsoft.Web.WebView2` 依赖改动位于 `feat/引入依赖` 分支，待 P6 使用前合并。
 
 ### 4.2 设置与路径
 
@@ -222,6 +224,8 @@ MyMCLauncher/
 ### 4.7 实施阶段划分（P0–P7）
 
 M1 按 8 个阶段推进，每个阶段要求「可构建、可验证、可回退」。详细拆解见 `docs/M1-WORKFLOW.md`；阶段细化文档：P0 → `docs/P0-FOUNDATION.md`。
+
+> 进度：P0 主体完成（WebView2 依赖待合并），P1 未开始。
 
 | 阶段 | 内容 | 主要产出 | 对应任务 | 依赖 |
 |------|------|----------|----------|------|
