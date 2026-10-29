@@ -80,12 +80,12 @@ P0 工程骨架
 
 **前置**：无。
 
-> 状态：主体已完成（`feat/p0-project-foundation`）；WebView2 依赖待合并（`feat/引入依赖`）。
+> 状态：P0 已完成（`feat/p0-project-foundation` + `feat/引入依赖`）。
 
 **任务**
 
 - [x] `git init` + `.gitignore`（`bin/`、`obj/`、`.vs/`），每阶段结束提交一次
-- [ ] 引入 `Microsoft.Web.WebView2` 包
+- [x] 引入 `Microsoft.Web.WebView2` 包
 - [x] 创建目录：`Models/`、`Services/`、`Services/Auth/`、`Minecraft/`、`Views/`、`Assets/`
 - [x] `AppPaths`：配置目录、日志目录、natives 目录
 - [x] `JsonStore`：读写 + 损坏备份 + 默认值
@@ -525,7 +525,7 @@ P0 工程骨架
 
 ## 10. 执行清单（按顺序）
 
-- [x] P0 工程骨架与基础设施（WebView2 依赖待合并）
+- [x] P0 工程骨架与基础设施
 - [ ] P1 设置、游戏目录、Java 检测
 - [ ] P2 离线账号与账号管理
 - [ ] P3 版本扫描与继承解析

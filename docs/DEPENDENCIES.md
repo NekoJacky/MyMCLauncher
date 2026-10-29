@@ -2,7 +2,7 @@
 
 > 适用项目：MyMCLauncher
 > 更新规则：**每次新增、升级或移除依赖，必须同步更新本文档与「变更记录」**
-> 最后更新：P0 §3.2 阶段
+> 最后更新：P0 完成
 
 ---
 
@@ -45,7 +45,7 @@
 
 | 包名 | 版本 | 用途 | 引入阶段 | 许可证 | 传递依赖 |
 |------|------|------|----------|--------|----------|
-| `Microsoft.Web.WebView2` | `1.0.4314.35` | 内嵌 Edge Chromium，用于微软账号登录页 | P0 引入，P6 使用 | Microsoft 专有许可（包内 `LICENSE.txt`） | 无 |
+| `Microsoft.Web.WebView2` | `1.0.4314.35` | 内嵌 Edge Chromium，用于微软登录兜底 | P0 引入，P6 兜底使用 | Microsoft 专有许可（包内 `LICENSE.txt`） | 无 |
 
 ### 3.1 使用方式（P6 预留）
 
@@ -88,7 +88,7 @@ using Microsoft.Web.WebView2.Wpf;
 
 | 依赖 | 是否必需 | 用途 | 检测 / 处理策略 |
 |------|----------|------|-----------------|
-| WebView2 Runtime（Evergreen） | 微软登录必需 | 承载登录页 | P6 启动登录前检测；缺失时提示下载安装 |
+| WebView2 Runtime（Evergreen） | 微软登录兜底必需 | 承载登录页 | P6 启动登录前检测；缺失时提示下载安装 |
 | Java 运行时 | 启动游戏必需 | 运行 Minecraft | P1 自动扫描 + 手动指定；按版本 `javaVersion` 校验 |
 | Minecraft 游戏文件 | M1 必需 | `versions` / `assets` / `libraries` | 用户指定 `.minecraft` 目录；P4 做完整性检查 |
 | 网络访问 | 微软登录必需 | `login.live.com` / `xboxlive.com` / `minecraftservices.com` | P6 统一超时与错误提示 |
@@ -160,4 +160,4 @@ dotnet build
 
 | 阶段 | 变更 | 版本 | 说明 |
 |------|------|------|------|
-| P0 | 新增 `Microsoft.Web.WebView2` | `1.0.4314.35` | 为 P6 微软登录预留；构建通过，无传递依赖 |
+| P0 | 新增 `Microsoft.Web.WebView2` | `1.0.4314.35` | 为 P6 微软登录兜底预留；构建通过，无传递依赖 |

@@ -476,4 +476,4 @@ chore(P0): bootstrap project skeleton, paths, json store, logging and global err
 
 **P0 完成标志**
 
-P0 自测清单通过（未手工验证项见 §5 注），且 `docs/PLAN.md` §4.1 对应任务已勾选；`feat/引入依赖` 合并后视为完全完成。
+P0 自测清单通过（未手工验证项见 §5 注），且 `docs/PLAN.md` §4.1 对应任务已勾选。
