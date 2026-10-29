@@ -3,6 +3,7 @@
 > 配套文档：`docs/M1-WORKFLOW.md`（P0）、`docs/PLAN.md`（§4.1、§4.7）
 > 阶段目标：项目可构建、可运行，具备后续所有阶段依赖的公共能力
 > 预计工作量：0.5 人日
+> 当前状态：P0 已完成
 
 ---
 
@@ -13,7 +14,7 @@
 P0 结束后，应具备：
 
 1. 干净的 Git 仓库与忽略规则
-2. 可成功 restore / build 的工程（含 WebView2 依赖）
+2. 可成功 restore / build 的工程（含 WebView2 依赖，P6 兜底用）
 3. 统一的目录与命名空间结构
 4. 配置目录、日志目录的统一定义与创建
 5. 通用 JSON 读写（容错、原子写入）
@@ -49,10 +50,10 @@ P0 结束后，应具备：
 
 ## 2. 前置检查
 
-- [ ] `dotnet --version` 为 `10.0.x`
-- [ ] WebView2 Runtime 已安装（开发机已确认）
-- [ ] NuGet 源可用（当前环境会重定向至 `nuget.azure.cn`，以实际 restore 为准）
-- [ ] 确认当前工程可构建：`dotnet build`
+- [x] `dotnet --version` 为 `10.0.x`
+- [x] WebView2 Runtime 已安装（开发机已确认）
+- [x] NuGet 源可用（当前环境会重定向至 `nuget.azure.cn`，以实际 restore 为准）
+- [x] 确认当前工程可构建：`dotnet build`
 
 ---
 
@@ -62,9 +63,9 @@ P0 结束后，应具备：
 
 **做什么**
 
-- [ ] `git init`
-- [ ] 新增 `.gitignore`
-- [ ] 首次提交（仅现有脚手架 + `.gitignore`）
+- [x] `git init`
+- [x] 新增 `.gitignore`
+- [x] 首次提交（仅现有脚手架 + `.gitignore`）
 
 **`.gitignore` 内容**
 
@@ -88,10 +89,11 @@ TestResults/
 ### 3.2 引入依赖
 
 > 依赖清单与维护说明见 `docs/DEPENDENCIES.md`。
+> 状态：依赖已引入（`Microsoft.Web.WebView2` 1.0.4314.35），P6 作为系统浏览器登录的兜底方案使用。
 
 **做什么**
 
-- [ ] `MyMCLauncher.csproj` 添加：
+- [x] `MyMCLauncher.csproj` 添加：
 
 ```xml
 <ItemGroup>
@@ -99,14 +101,14 @@ TestResults/
 </ItemGroup>
 ```
 
-- [ ] `dotnet restore`（或直接 `dotnet build`）
-- [ ] 确认 `obj/project.assets.json` 中包含该包
+- [x] `dotnet restore`（或直接 `dotnet build`）
+- [x] 确认 `obj/project.assets.json` 中包含该包
 
 **注意**
 
 - 当前 NuGet 请求可能被重定向到国内镜像，首次 restore 可能较慢
 - 若 restore 失败：优先排查网络/源，不要急着降级包
-- P0 只引入包，不写任何 WebView2 代码
+- P0 只引入包，不写任何 WebView2 代码；该包在 P6 作为系统浏览器登录的兜底方案使用
 
 **验收**：`dotnet build` 成功，包出现在依赖树中。
 
@@ -116,8 +118,8 @@ TestResults/
 
 **做什么**
 
-- [ ] 创建目录：`Models/`、`Services/`、`Services/Auth/`、`Minecraft/`、`Views/`、`Assets/`
-- [ ] 统一命名空间：
+- [x] 创建目录：`Models/`、`Services/`、`Services/Auth/`、`Minecraft/`、`Views/`、`Assets/`
+- [x] 统一命名空间：
   - `MyMCLauncher.Models`
   - `MyMCLauncher.Services`
   - `MyMCLauncher.Services.Auth`
@@ -285,11 +287,11 @@ public sealed class LogService : IDisposable
 
 **做什么**
 
-- [ ] `App.OnStartup` 注册：
+- [x] `App.OnStartup` 注册：
   - `DispatcherUnhandledException`
   - `AppDomain.CurrentDomain.UnhandledException`
   - `TaskScheduler.UnobservedTaskException`
-- [ ] 统一处理逻辑：
+- [x] 统一处理逻辑：
   1. `LogService.Error(...)` 写入异常
   2. `Flush()`
   3. `MessageBox.Show` 展示简要信息 + 日志路径
@@ -401,7 +403,7 @@ OnExit:
 - [ ] 新建 `MyMCLauncher.Tests`（xUnit）
 - [ ] 覆盖 `AppPaths` 路径拼接、`JsonStore` 容错/原子写入、`LogService` 并发写入
 
-> 若 P0 时间紧，可推迟到 P3 前，与规则/参数解析的测试一起补。
+> 状态：未创建测试项目；已用临时控制台对 `AppPaths`、`JsonStore`、`LogService` 做运行时验证。可推迟到 P3 前，与规则/参数解析的测试一起补。
 
 ---
 
@@ -430,16 +432,16 @@ OnExit:
 
 ## 5. 自测清单（P0 门禁）
 
-- [ ] `dotnet build` 0 error
-- [ ] 启动后 4 个目录自动创建
-- [ ] 日志文件生成，内容包含启动信息
-- [ ] 日志面板实时显示且不卡顿
-- [ ] 日志超过 1000 条时旧条目被裁剪
-- [ ] 非法 JSON 文件被备份为 `.corrupt-*`，程序继续运行
-- [ ] 人为抛出 UI 异常：弹窗 + 日志 + 退出
-- [ ] 人为抛出 Task 异常：日志记录，进程不崩溃
-- [ ] 关闭程序后日志已落盘
-- [ ] `git status` 干净（构建产物未入库）
+- [x] `dotnet build` 0 error
+- [x] 启动后 4 个目录自动创建
+- [x] 日志文件生成，内容包含启动信息
+- [x] 日志面板实时显示且不卡顿
+- [x] 日志超过 1000 条时旧条目被裁剪
+- [x] 非法 JSON 文件被备份为 `.corrupt-*`，程序继续运行
+- [ ] 人为抛出 UI 异常：弹窗 + 日志 + 退出（代码已实现，未手工触发）
+- [ ] 人为抛出 Task 异常：日志记录，进程不崩溃（代码已实现，未手工触发）
+- [x] 关闭程序后日志已落盘
+- [x] `git status` 干净（构建产物未入库）
 
 ---
 
@@ -474,4 +476,4 @@ chore(P0): bootstrap project skeleton, paths, json store, logging and global err
 
 **P0 完成标志**
 
-P0 自测清单全部通过，且 `docs/PLAN.md` §4.1 对应任务已勾选。
+P0 自测清单通过（未手工验证项见 §5 注），且 `docs/PLAN.md` §4.1 对应任务已勾选；`feat/引入依赖` 合并后视为完全完成。

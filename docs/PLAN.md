@@ -1,9 +1,10 @@
 # MyMCLauncher 开发规划文档
 
-> 版本：v0.3
-> 状态：M1 方案已确认
+> 版本：v0.5
+> 状态：M1 进行中（P0 主体完成，WebView2 依赖待合并）
 > 范围：M1 启动功能（正版/离线登录、游戏目录选择、启动本地已安装版本）
 > 配套文档：`docs/M1-WORKFLOW.md`（M1 实施流程规划）
+> 登录方案：系统浏览器 + 本地回环（默认），WebView2 兜底
 
 ---
 
@@ -14,12 +15,12 @@
 | 项目类型 | WPF 桌面应用（`WinExe`） |
 | 目标框架 | `net10.0-windows` |
 | 语言特性 | C#、`Nullable`、`ImplicitUsings` 开启 |
-| 现有文件 | `App.xaml`、`MainWindow.xaml`（空白 Grid）、`AssemblyInfo.cs`、`MyMCLauncher.slnx` |
+| 现有文件 | WPF 入口 + `Models/`、`Services/`（AppPaths / JsonStore / LogService / AppHost）+ `docs/` |
 | 开发环境 | .NET SDK 10.0.401，WebView2 Runtime 已安装 |
 | 本地 Minecraft | `%APPDATA%\.minecraft` 仅有 `runtime`（无 `versions`/`assets`/`libraries`） |
 | 本地 Java | 无全局 Java；仅有 Mojang 运行时 `runtime/java-runtime-epsilon`（OpenJDK 25） |
 
-**结论**：项目处于脚手架阶段，尚未有任何业务逻辑。M1 从零开始实现。
+**结论**：P0 基础设施主体已完成，进入 P1（设置、游戏目录、Java 检测）。
 
 ---
 
@@ -97,7 +98,7 @@ MyMCLauncher/
 
 | 依赖 | 用途 | 说明 |
 |------|------|------|
-| `Microsoft.Web.WebView2` | 内嵌微软登录页 | 建议 `1.0.4314.x`；运行时缺失时给出安装提示 |
+| `Microsoft.Web.WebView2` | 微软登录兜底（默认使用系统浏览器 + 本地回环） | 建议 `1.0.4314.x`；运行时缺失只影响兜底方案 |
 | `System.Text.Json` | JSON 序列化 | 内置 |
 | `System.Security.Cryptography.ProtectedData` | DPAPI 加密 token | 内置（Windows） |
 
@@ -108,11 +109,13 @@ MyMCLauncher/
 ### 4.1 基础设施
 
 - [ ] 引入 `Microsoft.Web.WebView2` 包
-- [ ] `AppPaths`：配置目录 `%APPDATA%\MyMCLauncher\`、日志目录 `logs\`
-- [ ] `JsonStore`：统一读写 + 容错（损坏时备份并重建）
-- [ ] `LogService`：内存环形日志 + 落盘 + UI 实时推送
-- [ ] 全局异常捕获（`DispatcherUnhandledException` / `TaskScheduler.UnobservedTaskException`）
-- [ ] 使用 WPF 原生事件处理与数据绑定（不引入 MVVM 框架）
+- [x] `AppPaths`：配置目录 `%APPDATA%\MyMCLauncher\`、日志目录 `logs\`
+- [x] `JsonStore`：统一读写 + 容错（损坏时备份并重建）
+- [x] `LogService`：内存环形日志 + 落盘 + UI 实时推送
+- [x] 全局异常捕获（`DispatcherUnhandledException` / `TaskScheduler.UnobservedTaskException`）
+- [x] 使用 WPF 原生事件处理与数据绑定（不引入 MVVM 框架）
+
+> 说明：`Microsoft.Web.WebView2` 依赖改动位于 `feat/引入依赖` 分支，待 P6 使用前合并。
 
 ### 4.2 设置与路径
 
@@ -139,10 +142,15 @@ MyMCLauncher/
 
 #### 4.3.2 微软正版登录
 
-- [ ] WebView2 登录窗口，拦截跳转 URL 提取授权码
+- [ ] `IAuthorizationCodeProvider` 抽象（默认回环 / 兜底 WebView2）
+- [ ] 系统浏览器 + 本地回环（默认）：
+  - [ ] PKCE（S256）+ `state`
+  - [ ] `HttpListener` 监听 `http://localhost:<port>/callback`
+  - [ ] 打开系统默认浏览器，捕获授权码
+- [ ] WebView2 兜底：加载同一授权页并提取授权码
 - [ ] 令牌链：
-  1. `login.live.com/oauth20_authorize.srf` → 授权码
-  2. `login.live.com/oauth20_token.srf` → MSA access / refresh token
+  1. `login.microsoftonline.com/consumers/oauth2/v2.0/authorize` → 授权码
+  2. `login.microsoftonline.com/consumers/oauth2/v2.0/token` → MSA access / refresh token
   3. `user.auth.xboxlive.com/user/authenticate` → XBL Token
   4. `xsts.auth.xboxlive.com/xsts/authorize` → XSTS Token + UHS
   5. `api.minecraftservices.com/authentication/login_with_xbox` → Minecraft Token
@@ -153,7 +161,7 @@ MyMCLauncher/
   - 无 Xbox 账号（`2148916233`）
   - 地区不支持（`2148916235`）
   - 儿童/家庭账号（`2148916238`）
-  - 网络错误、WebView2 运行时缺失
+  - 网络错误、回环失败、WebView2 运行时缺失（兜底）
 - [ ] 账号管理：列表、切换、删除、记住上次账号
 - [ ] 敏感字段 DPAPI 加密存储（`CurrentUser` 范围）
 
@@ -210,12 +218,14 @@ MyMCLauncher/
   - [ ] 启动按钮、状态栏
   - [ ] 日志面板（可折叠/滚动）
 - [ ] 添加账号窗口：离线登录 / 微软登录入口 / 已有账号列表
-- [ ] 微软登录窗口：WebView2 承载 + 加载/错误状态
+- [ ] 微软登录：系统浏览器（默认）/ WebView2 兜底窗口 + 加载/错误状态
 - [ ] 基础视觉样式统一（颜色、字体、圆角、按钮状态）
 
 ### 4.7 实施阶段划分（P0–P7）
 
 M1 按 8 个阶段推进，每个阶段要求「可构建、可验证、可回退」。详细拆解见 `docs/M1-WORKFLOW.md`；阶段细化文档：P0 → `docs/P0-FOUNDATION.md`。
+
+> 进度：P0 主体完成（WebView2 依赖待合并），P1 未开始。
 
 | 阶段 | 内容 | 主要产出 | 对应任务 | 依赖 |
 |------|------|----------|----------|------|
@@ -225,7 +235,7 @@ M1 按 8 个阶段推进，每个阶段要求「可构建、可验证、可回�
 | P3 | 版本扫描与继承解析 | 版本列表、合并后的版本模型 | §4.4 | P1 |
 | P4 | 启动构建与完整性检查 | classpath、natives、参数、缺失清单 | §4.5 | P1、P2、P3 |
 | P5 | 启动执行与日志 | 真实启动游戏、日志回传 | §4.5（进程部分）、§4.6 | P4 |
-| P6 | 微软正版登录 | WebView2 登录、令牌链、刷新 | §4.3.2、§4.6 | P0、P1（可与 P2–P5 并行） |
+| P6 | 微软正版登录 | 系统浏览器 + 回环登录、令牌链、刷新（WebView2 兜底） | §4.3.2、§4.6 | P0、P1（可与 P2–P5 并行） |
 | P7 | 界面整合与打磨 | 主界面、错误提示、验收 | §4.6、§10 | P1–P6 |
 
 ```text
@@ -282,17 +292,31 @@ P0 工程骨架
 
 ### 5.1 微软登录流程
 
+**默认：系统浏览器 + 本地回环**
+
 ```text
 用户点击“微软登录”
-  └─ 打开 WebView2 → login.live.com 授权页
-       └─ 用户登录并同意
-            └─ 跳转 oauth20_desktop.srf?code=...
-                 └─ 拦截 URL，提取 code
-                      └─ token 端点换取 MSA access/refresh token
-                           └─ XBL 认证 → XSTS 认证（RETAIL / rp://api.minecraftservices.com/）
-                                └─ Minecraft 登录 → 获取 Minecraft Token
-                                     └─ 获取 profile（名称/UUID）
-                                          └─ 保存账号（DPAPI 加密）→ 关闭窗口
+  └─ 生成 PKCE（code_verifier / code_challenge）与 state
+       └─ 启动本地 HttpListener（http://localhost:<port>/callback）
+            └─ 打开系统默认浏览器 → Microsoft 授权页
+                 （consumers 端点，client_id + PKCE + redirect_uri）
+                 └─ 用户登录并同意
+                      └─ 浏览器重定向到 http://localhost:<port>/callback?code=...
+                           └─ HttpListener 捕获 code，校验 state
+                                └─ token 端点换取 MSA access/refresh token
+                                     └─ XBL 认证 → XSTS 认证
+                                          └─ Minecraft 登录 → 获取 Minecraft Token
+                                               └─ 获取 profile（名称/UUID）
+                                                    └─ 保存账号（DPAPI 加密）
+```
+
+**兜底：内嵌 WebView2**
+
+```text
+系统浏览器不可用 / 无法本地回环 / 用户选择兜底
+  └─ 打开 WebView2 加载同一授权页
+       └─ 拦截跳转或捕获回环回调，提取 code
+            └─ 后续令牌链与默认方案完全一致
 ```
 
 ### 5.2 启动流程
@@ -373,12 +397,21 @@ P0 工程骨架
 
 | 步骤 | 端点 |
 |------|------|
-| 授权 | `https://login.live.com/oauth20_authorize.srf` |
-| 换 token | `https://login.live.com/oauth20_token.srf` |
+| 授权 | `https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize` |
+| 换 token | `https://login.microsoftonline.com/consumers/oauth2/v2.0/token` |
 | XBL | `https://user.auth.xboxlive.com/user/authenticate` |
 | XSTS | `https://xsts.auth.xboxlive.com/xsts/authorize` |
 | MC 登录 | `https://api.minecraftservices.com/authentication/login_with_xbox` |
 | MC 资料 | `https://api.minecraftservices.com/minecraft/profile` |
+
+**Azure 应用配置（公开信息）**
+
+- `client_id`：`cbca0412-33b7-40de-b845-12e8c453b816`
+- 账户类型：仅个人 Microsoft 账户 → `consumers` 端点（若为多租户 + 个人，则改用 `common`）
+- `redirect_uri`：`http://localhost:<port>/callback`（注册为 `http://localhost`，允许任意本地端口）
+- `scope`：`XboxLive.signin offline_access openid profile`
+- `PKCE`：`S256`；`state`：随机生成并校验
+- 公共客户端，不保存 client secret
 
 - XSTS 请求：`SandboxId="RETAIL"`，`RelyingParty="rp://api.minecraftservices.com/"`，`TokenType="JWT"`
 - MC 登录 `identityToken`：`"XBL3.0 x=<uhs>;<xstsToken>"`
@@ -422,9 +455,10 @@ P0 工程骨架
 
 | 风险 | 影响 | 对策 |
 |------|------|------|
-| 社区公开 `client_id` 被限流/失效 | 微软登录不可用 | 支持在设置中覆盖为自己注册的 Azure 应用 client_id |
-| 国内访问 `login.live.com` / Xbox API 不稳定 | 登录失败/超时 | 明确错误提示、超时与重试、代理设置预留 |
-| WebView2 Runtime 缺失 | 登录窗口无法打开 | 启动时检测并提示安装链接 |
+| Azure 应用配置错误或 `client_id` 变更 | 微软登录不可用 | `client_id` / `redirect_uri` 集中配置，登录前自检并记录脱敏日志 |
+| 本地回环端口被占用 / 被安全软件拦截 | 无法接收授权回调 | 使用动态端口；失败时提示并回退 WebView2 |
+| 国内访问 `login.microsoftonline.com` / Xbox API 不稳定 | 登录失败/超时 | 明确错误提示、超时与重试、代理设置预留 |
+| WebView2 Runtime 缺失 | 兜底方案不可用 | 默认系统浏览器流程不受影响；仍检测并提示安装链接 |
 | Token 明文存储 | 账号泄露 | DPAPI（CurrentUser）加密 |
 | 版本 JSON 差异大（Forge/Fabric 等） | 启动失败 | 以官方合并规则为准，覆盖多级继承与规则求值测试 |
 | Java 版本不匹配 | 启动即崩 | 读 `javaVersion` 校验，警告并允许强制启动 |
@@ -437,7 +471,7 @@ P0 工程骨架
 
 | # | 事项 | 决定 |
 |---|------|------|
-| 1 | 微软登录 client_id | 本期使用社区公开 `00000000402b5328`，跑通后再评估是否改为自注册 Azure 应用 |
+| 1 | 微软登录方式与 client_id | 自注册 Azure 应用 `cbca0412-33b7-40de-b845-12e8c453b816`（仅个人账户）；默认系统浏览器 + 本地回环 + PKCE，WebView2 兜底 |
 | 2 | 启动前完整性检查 | M1 实现，输出缺失文件清单 |
 | 3 | UI 技术路线 | 使用 WPF 原生框架（XAML + code-behind + 原生数据绑定），不引入 MVVM 库或第三方 UI 框架 |
 | 4 | 版本隔离 | M1 不做，统一使用 `.minecraft` 作为 gameDir；待下载功能完成后再评估 |
