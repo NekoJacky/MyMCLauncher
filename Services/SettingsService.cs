@@ -85,8 +85,16 @@ public sealed class SettingsService
     {
         ArgumentNullException.ThrowIfNull(settings);
 
+        var previous = Current;
         Current = settings;
-        return TrySave(out error);
+
+        if (TrySave(out error))
+        {
+            return true;
+        }
+
+        Current = previous;
+        return false;
     }
 
     /// <summary>
@@ -96,8 +104,9 @@ public sealed class SettingsService
     {
         ArgumentNullException.ThrowIfNull(mutate);
 
-        mutate(Current);
-        TrySave(out _);
+        var draft = Current.Clone();
+        mutate(draft);
+        Apply(draft, out _);
     }
 
     /// <summary>
@@ -105,8 +114,7 @@ public sealed class SettingsService
     /// </summary>
     public void ResetToDefaults()
     {
-        Current = CreateDefaults();
-        TrySave(out _);
+        Apply(CreateDefaults(), out _);
     }
 
     /// <summary>
