@@ -28,6 +28,8 @@ public sealed class AppHost : IDisposable
         Log.Info("MyMCLauncher 启动");
         Log.Info($"Root = {Paths.Root}");
         Log.Info($"OS = {Environment.OSVersion.VersionString}，64 位进程 = {Environment.Is64BitProcess}");
+
+        Settings = new SettingsService(Paths, Json, Log);
     }
 
     /// <summary>
@@ -44,6 +46,11 @@ public sealed class AppHost : IDisposable
     /// 日志服务。
     /// </summary>
     public LogService Log { get; }
+
+    /// <summary>
+    /// 设置服务。
+    /// </summary>
+    public SettingsService Settings { get; }
 
     /// <inheritdoc />
     public void Dispose()
