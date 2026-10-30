@@ -221,7 +221,7 @@ MyMCLauncher/
 
 ### 4.7 实施阶段划分（P0–P7）
 
-M1 按 8 个阶段推进，每个阶段要求「可构建、可验证、可回退」。详细拆解见 `docs/M1-WORKFLOW.md`；阶段细化文档：P0 → `docs/P0-FOUNDATION.md`。
+M1 按 8 个阶段推进，每个阶段要求「可构建、可验证、可回退」。详细拆解见 `docs/M1-WORKFLOW.md`；阶段细化文档：P0 → `docs/P0-FOUNDATION.md`，P1 → `docs/P1-SETTINGS-JAVA.md`。
 
 > 进度：P0 已完成，P1 未开始。
 
