@@ -18,22 +18,30 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0"
-                BorderBrush="#DDDDDD"
-                BorderThickness="1"
-                CornerRadius="6"
-                Padding="24">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock Text="MyMCLauncher"
-                           FontSize="28"
-                           FontWeight="SemiBold"
-                           HorizontalAlignment="Center" />
-                <TextBlock Text="内容区占位：账号 / 游戏目录 / 版本列表 / 启动按钮"
-                           Margin="0,8,0,0"
-                           Foreground="#666666"
-                           HorizontalAlignment="Center" />
-            </StackPanel>
-        </Border>
+        <Grid Grid.Row="0">
+            <Border BorderBrush="#DDDDDD"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="24">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="MyMCLauncher"
+                               FontSize="28"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center" />
+                    <TextBlock Text="内容区占位：账号 / 游戏目录 / 版本列表 / 启动按钮"
+                               Margin="0,8,0,0"
+                               Foreground="#666666"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <Button Content="设置"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Margin="0,12,12,0"
+                    Padding="16,4"
+                    Click="OpenSettings_Click" />
+        </Grid>
 
         <Grid Grid.Row="1" Margin="0,12,0,0">
             <Grid.RowDefinitions>
