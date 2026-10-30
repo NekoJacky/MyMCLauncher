@@ -1,7 +1,7 @@
 # MyMCLauncher 开发规划文档
 
-> 版本：v0.5
-> 状态：M1 进行中（P0 已完成）
+> 版本：v0.6
+> 状态：M1 进行中（P0、P1 已完成）
 > 范围：M1 启动功能（正版/离线登录、游戏目录选择、启动本地已安装版本）
 > 配套文档：`docs/M1-WORKFLOW.md`（M1 实施流程规划）
 > 登录方案：系统浏览器 + 本地回环（默认），WebView2 兜底
@@ -15,12 +15,12 @@
 | 项目类型 | WPF 桌面应用（`WinExe`） |
 | 目标框架 | `net10.0-windows` |
 | 语言特性 | C#、`Nullable`、`ImplicitUsings` 开启 |
-| 现有文件 | WPF 入口 + `Models/`、`Services/`（AppPaths / JsonStore / LogService / AppHost）+ `docs/` |
+| 现有文件 | WPF 入口 + `Models/`、`Services/`（AppPaths / JsonStore / LogService / AppHost / Settings / Java）+ `Views/` + `docs/` |
 | 开发环境 | .NET SDK 10.0.401，WebView2 Runtime 已安装 |
 | 本地 Minecraft | `%APPDATA%\.minecraft` 仅有 `runtime`（无 `versions`/`assets`/`libraries`） |
 | 本地 Java | 无全局 Java；仅有 Mojang 运行时 `runtime/java-runtime-epsilon`（OpenJDK 25） |
 
-**结论**：P0 已完成，进入 P1（设置、游戏目录、Java 检测）。
+**结论**：P0、P1 已完成，进入 P2（离线账号与账号管理）。
 
 ---
 
@@ -117,17 +117,17 @@ MyMCLauncher/
 
 ### 4.2 设置与路径
 
-- [ ] 游戏目录选择（`Microsoft.Win32.OpenFolderDialog`）
-- [ ] 目录合法性校验（是否含 `versions`/`assets`/`libraries`，允许空目录并提示）
-- [ ] 设置持久化（见 §6.1）
-- [ ] Java 检测：
-  - [ ] 环境变量 `JAVA_HOME`、`PATH`
-  - [ ] 常见安装目录（`Program Files\Java`、Adoptium、Microsoft、Zulu 等）
-  - [ ] 游戏目录下 `runtime/java-runtime-*/bin/java.exe`
-  - [ ] 读取版本（优先 `release` 文件，兜底 `java -version`）
-  - [ ] 手动指定 `java.exe`
-  - [ ] 按 `javaVersion.majorVersion` 自动匹配，版本不符时警告并允许强制启动
-- [ ] 内存设置（默认自动：物理内存 1/4，限制在 1024–8192 MB）
+- [x] 游戏目录选择（`Microsoft.Win32.OpenFolderDialog`）
+- [x] 目录合法性校验（是否含 `versions`/`assets`/`libraries`，允许空目录并提示）
+- [x] 设置持久化（见 §6.1）
+- [x] Java 检测：
+  - [x] 环境变量 `JAVA_HOME`、`PATH`
+  - [x] 常见安装目录（`Program Files\Java`、Adoptium、Microsoft、Zulu 等）
+  - [x] 游戏目录下 `runtime/java-runtime-*/bin/java.exe`
+  - [x] 读取版本（优先 `release` 文件，兜底 `java -version`）
+  - [x] 手动指定 `java.exe`（也允许其他 Java 可执行文件）
+  - [ ] 按 `javaVersion.majorVersion` 自动匹配，版本不符时警告并允许强制启动（P3 接入）
+- [x] 内存设置（默认自动：物理内存 1/4，128 对齐，256–8192 MB）
 
 ### 4.3 账号系统
 
@@ -223,7 +223,7 @@ MyMCLauncher/
 
 M1 按 8 个阶段推进，每个阶段要求「可构建、可验证、可回退」。详细拆解见 `docs/M1-WORKFLOW.md`；阶段细化文档：P0 → `docs/P0-FOUNDATION.md`，P1 → `docs/P1-SETTINGS-JAVA.md`。
 
-> 进度：P0 已完成，P1 未开始。
+> 进度：P0、P1 已完成，P2 未开始。
 
 | 阶段 | 内容 | 主要产出 | 对应任务 | 依赖 |
 |------|------|----------|----------|------|
