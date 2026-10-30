@@ -1,4 +1,5 @@
 using System;
+using MyMCLauncher.Services.Java;
 
 namespace MyMCLauncher.Services;
 
@@ -30,6 +31,7 @@ public sealed class AppHost : IDisposable
         Log.Info($"OS = {Environment.OSVersion.VersionString}，64 位进程 = {Environment.Is64BitProcess}");
 
         Settings = new SettingsService(Paths, Json, Log);
+        Java = new JavaLocator(Log);
     }
 
     /// <summary>
@@ -51,6 +53,11 @@ public sealed class AppHost : IDisposable
     /// 设置服务。
     /// </summary>
     public SettingsService Settings { get; }
+
+    /// <summary>
+    /// Java 定位服务。
+    /// </summary>
+    public JavaLocator Java { get; }
 
     /// <inheritdoc />
     public void Dispose()
