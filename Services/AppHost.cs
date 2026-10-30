@@ -32,6 +32,9 @@ public sealed class AppHost : IDisposable
 
         Settings = new SettingsService(Paths, Json, Log);
         Java = new JavaLocator(Log);
+        Memory = new MemoryAdvisor();
+
+        Log.Info($"物理内存 = {Memory.GetTotalPhysicalMemoryMb()} MB，建议内存 = {Memory.GetRecommendedMemoryMb()} MB");
     }
 
     /// <summary>
@@ -58,6 +61,11 @@ public sealed class AppHost : IDisposable
     /// Java 定位服务。
     /// </summary>
     public JavaLocator Java { get; }
+
+    /// <summary>
+    /// 内存建议与校验。
+    /// </summary>
+    public MemoryAdvisor Memory { get; }
 
     /// <inheritdoc />
     public void Dispose()
