@@ -28,12 +28,47 @@
                                FontSize="28"
                                FontWeight="SemiBold"
                                HorizontalAlignment="Center" />
-                    <TextBlock Text="内容区占位：账号 / 游戏目录 / 版本列表 / 启动按钮"
+                    <TextBlock Text="内容区占位：版本列表 / 启动按钮"
                                Margin="0,8,0,0"
                                Foreground="#666666"
                                HorizontalAlignment="Center" />
                 </StackPanel>
             </Border>
+
+            <StackPanel HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Orientation="Horizontal"
+                        Margin="12,12,0,0">
+                <TextBlock Text="账号"
+                           VerticalAlignment="Center"
+                           Margin="0,0,8,0" />
+
+                <Grid>
+                    <ComboBox x:Name="AccountComboBox"
+                              Width="220"
+                              DisplayMemberPath="DisplayName"
+                              VerticalContentAlignment="Center"
+                              SelectionChanged="AccountComboBox_SelectionChanged" />
+                    <TextBlock x:Name="NoAccountText"
+                               Text="未登录"
+                               Margin="10,0,0,0"
+                               VerticalAlignment="Center"
+                               Foreground="#888888"
+                               IsHitTestVisible="False"
+                               Visibility="Collapsed" />
+                </Grid>
+
+                <Button x:Name="AddAccountButton"
+                        Content="添加账号"
+                        Margin="8,0,0,0"
+                        Padding="12,4"
+                        Click="AddAccount_Click" />
+                <Button x:Name="RemoveAccountButton"
+                        Content="删除"
+                        Margin="8,0,0,0"
+                        Padding="12,4"
+                        Click="RemoveAccount_Click" />
+            </StackPanel>
 
             <Button Content="设置"
                     HorizontalAlignment="Right"
@@ -97,7 +132,9 @@
 
         <StatusBar Grid.Row="2" Margin="0,12,0,0">
             <StatusBarItem>
-                <TextBlock x:Name="StatusText" Text="就绪" />
+                <TextBlock x:Name="StatusText"
+                           Text="就绪"
+                           TextTrimming="CharacterEllipsis" />
             </StatusBarItem>
         </StatusBar>
     </Grid>
