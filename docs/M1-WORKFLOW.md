@@ -122,20 +122,22 @@ P0 工程骨架
 
 **前置**：P0。
 
+> 状态：已完成（`feat/p1-settings-java-detection`，待合并）。
+
 **任务**
 
-- [ ] `LauncherSettings` 模型 + `SettingsService`
-- [ ] 游戏目录选择（`OpenFolderDialog`）+ 目录校验与提示
-- [ ] 设置界面/区域：目录、Java、内存
-- [ ] `JavaLocator`：
-  - [ ] `JAVA_HOME`、`PATH`
-  - [ ] 常见安装目录
-  - [ ] `<gameDir>/runtime/java-runtime-*/bin/java.exe`
-  - [ ] 读取版本（`release` 文件优先）
-- [ ] Java 手动指定（选择 `java.exe`）
-- [ ] 版本号解析与比较（支持 `1.8`、`17`、`21` 等）
-- [ ] 内存默认值计算（物理内存 1/4，限制 1024–8192 MB）
-- [ ] 设置持久化与恢复
+- [x] `LauncherSettings` 模型 + `SettingsService`
+- [x] 游戏目录选择（`OpenFolderDialog`）+ 目录校验与提示
+- [x] 设置界面/区域：目录、Java、内存
+- [x] `JavaLocator`：
+  - [x] `JAVA_HOME`、`PATH`
+  - [x] 常见安装目录
+  - [x] `<gameDir>/runtime/java-runtime-*/bin/java.exe`
+  - [x] 读取版本（`release` 文件优先）
+- [x] Java 手动指定（允许 `java.exe` / `javaw.exe` / 其他可执行文件）
+- [x] 版本号解析与比较（支持 `1.8`、`17`、`21` 等）
+- [x] 内存默认值计算（物理内存 1/4，128 对齐，256–8192 MB）
+- [x] 设置持久化与恢复
 
 **产出**：设置面板可用，重启后目录/Java/内存保持。
 
@@ -528,7 +530,7 @@ P0 工程骨架
 ## 10. 执行清单（按顺序）
 
 - [x] P0 工程骨架与基础设施
-- [ ] P1 设置、游戏目录、Java 检测
+- [x] P1 设置、游戏目录、Java 检测
 - [ ] P2 离线账号与账号管理
 - [ ] P3 版本扫描与继承解析
 - [ ] P4 启动构建与完整性检查

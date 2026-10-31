@@ -2,6 +2,7 @@
 
 > 阶段：P1
 > 决策状态：已确认
+> 实现状态：已完成（`feat/p1-settings-java-detection`，待合并）
 > 前置：P0 已完成（`AppPaths` / `JsonStore` / `LogService` / `AppHost` / 主窗口壳）
 > 范围：设置持久化、游戏目录选择与校验、Java 自动/手动检测、内存设置、设置界面
 > 非目标：版本扫描与解析（P3）、游戏下载（M2）、Java 运行时自动下载（M3）
@@ -34,6 +35,7 @@ P1 结束后应具备：
 | `Services/Java/JavaLocator.cs` | Java 扫描与信息读取 |
 | `Services/Java/JavaSelector.cs` | 候选推荐逻辑 |
 | `Services/MemoryAdvisor.cs` | 默认内存计算与校验 |
+| `Services/GameDirectoryValidator.cs` | 游戏目录状态校验 |
 | `Views/SettingsWindow.xaml(.cs)` | 设置窗口 |
 | `MainWindow.xaml(.cs)` | 增加设置入口与摘要 |
 | `Services/AppHost.cs` | 注册 `Settings`、`Java`、`Memory` |
@@ -161,7 +163,7 @@ public sealed class LauncherSettings
 默认值策略：
 
 - `GameDirectory`：若 `%APPDATA%\.minecraft` 存在，首次启动自动填入
-- `MemoryMb`：首次启动写入建议值
+- `MemoryMb`：自动模式下可为 0，实际值由 `MemoryAdvisor` 计算；保存时写入实际值
 - 其余为空
 
 ### 4.2 `settings.json`
@@ -434,11 +436,12 @@ public static JavaInfo? SelectBest(
 ### 8.1 默认值
 
 ```csharp
-public static class MemoryAdvisor
+public sealed class MemoryAdvisor
 {
-    public static int GetRecommendedMemoryMb();      // 总内存 1/4，128 对齐，256–8192
-    public static int Clamp(int requestedMb);
-    public static string? Validate(int requestedMb); // 返回警告文本，null 表示正常
+    public int GetTotalPhysicalMemoryMb();
+    public int GetRecommendedMemoryMb();             // 总内存 1/4，128 对齐，256–8192
+    public int Clamp(int requestedMb);
+    public string? Validate(int requestedMb);        // 返回警告文本，null 表示正常
 }
 ```
 
@@ -548,14 +551,14 @@ AppHost 创建
 
 ## 11. 任务拆解与提交计划
 
-| # | 内容 | 提交信息建议 |
-|---|------|--------------|
-| 1 | `LauncherSettings` + `SettingsService` + AppHost 注册 | `feat(P1): add settings model and service` |
-| 2 | `JavaVersion` + `JavaVersionParser` + 单测 | `feat(P1): add Java version parsing` |
-| 3 | `JavaInfo` + `JavaLocator`（release 优先、进程回退） | `feat(P1): add Java locator and inspection` |
-| 4 | `JavaSelector` + `MemoryAdvisor` | `feat(P1): add Java selection and memory advisor` |
-| 5 | `SettingsWindow` + 主窗口入口/摘要 | `feat(P1): add settings window and main window integration` |
-| 6 | 文档勾选、验收记录 | `docs(P1): update progress and notes` |
+| # | 内容 | 提交信息建议 | 状态 |
+|---|------|--------------|------|
+| 1 | `LauncherSettings` + `SettingsService` + AppHost 注册 | `feat(P1): add settings model and service` | 已完成 |
+| 2 | `JavaVersion` + `JavaVersionParser` + 解析验证 | `feat(P1): add Java version parsing` | 已完成（临时控制台验证，未建 xUnit） |
+| 3 | `JavaInfo` + `JavaLocator`（release 优先、进程回退） | `feat(P1): add Java locator and inspection` | 已完成 |
+| 4 | `JavaSelector` + `MemoryAdvisor` | `feat(P1): add Java selection and memory advisor` | 已完成 |
+| 5 | `SettingsWindow` + 主窗口入口/摘要 | `feat(P1): add settings window and main window integration` | 已完成 |
+| 6 | 文档勾选、验收记录 | `docs(P1): update progress and notes` | 本次提交 |
 
 建议分支：`feat/p1-settings-java-detection`（阶段内按任务提交，阶段结束统一 PR）。
 
@@ -595,6 +598,8 @@ AppHost 创建
 - `MemoryAdvisor`：2/4/8/16/32/64 GB、下限 256、128 对齐、上限 8192
 - `SettingsService`：默认值、往返序列化、非法字段纠正、损坏文件恢复
 - `JavaSelector`：指定路径优先、精确 major、更高 major、无匹配
+
+> 当前尚未建立 xUnit 项目；以上用例已通过临时控制台验证（Java 版本解析、内存公式、Java 选择、设置往返、Java 扫描）。正式测试项目可随 P3 的规则/参数解析一起补。
 
 ### 13.2 手工测试
 
@@ -724,3 +729,34 @@ totalMemoryMB >= 32768 ? 8192 : max(round(totalMemoryMB / 4 / 128) * 128, 256)
 - 分配比例：到 T1 100%、T2 70%、T3 40%，再额外 15%
 - 手动模式滑条按 0.1 / 0.5 / 1 / 2 GB 分档
 - 默认全局自动；实例默认跟随全局
+
+---
+
+## 17. 实现记录
+
+### 17.1 提交
+
+| 提交 | 内容 |
+|------|------|
+| `d598d11` | P1 设计文档（main） |
+| `224ac77` | 设置模型与服务 |
+| `0685816` | Java 版本解析 |
+| `bf0ba88` | Java 定位与检查 |
+| `9433dc8` | Java 选择与内存建议 |
+| `cccc557` | 设置窗口与主窗口集成 |
+
+### 17.2 与设计的差异
+
+- 注册表扫描未实现（按 §15.1 决策）
+- `MemoryAdvisor` 实现为实例类，由 `AppHost.Memory` 持有
+- 新增 `Services/GameDirectoryValidator.cs`
+- `JavaLocator` 构造仅依赖 `LogService`
+- 未引入 xUnit 项目，使用临时控制台验证
+
+### 17.3 验证结果
+
+- Java 扫描：找到 Mojang 运行时 Java 25.0.1（x64），约 100 ms
+- 版本解析：`1.8.0_392`、`17.0.9+9`、`21-ea`、`25-ea+36` 等样例通过
+- 内存公式：1/4、128 对齐、256 下限、32 GB 以上 8192
+- 设置：默认目录自动填入、路径规范化、null/非法值纠正、损坏恢复
+- UI：`SettingsWindow` 可加载并完成扫描（冒烟测试）
