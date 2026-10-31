@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using MyMCLauncher.Models;
 using MyMCLauncher.Services;
 using MyMCLauncher.Views;
@@ -19,6 +20,7 @@ public partial class MainWindow : Window
 
     private readonly AppHost _host;
     private readonly ObservableCollection<LogEntry> _logItems = new();
+    private bool _accountsInitialized;
 
     /// <summary>
     /// 初始化主窗口。
@@ -36,9 +38,11 @@ public partial class MainWindow : Window
         }
 
         _host.Log.LogEmitted += OnLogEmitted;
+        _host.Accounts.Changed += OnAccountsChanged;
         Closed += OnClosed;
 
-        UpdateStatusSummary();
+        RefreshAccounts();
+        _accountsInitialized = true;
     }
 
     private void OnLogEmitted(LogEntry entry)
@@ -69,7 +73,117 @@ public partial class MainWindow : Window
     private void OnClosed(object? sender, EventArgs e)
     {
         _host.Log.LogEmitted -= OnLogEmitted;
+        _host.Accounts.Changed -= OnAccountsChanged;
         Closed -= OnClosed;
+    }
+
+    private void OnAccountsChanged()
+    {
+        if (!Dispatcher.CheckAccess())
+        {
+            Dispatcher.BeginInvoke(new Action(RefreshAccounts));
+            return;
+        }
+
+        RefreshAccounts();
+    }
+
+    private void RefreshAccounts()
+    {
+        var accounts = _host.Accounts.Accounts;
+        var current = _host.Accounts.Current;
+        var wasInitialized = _accountsInitialized;
+        _accountsInitialized = false;
+
+        try
+        {
+            AccountComboBox.ItemsSource = accounts;
+            AccountComboBox.SelectedItem = current is null
+                ? null
+                : accounts.FirstOrDefault(account =>
+                    string.Equals(account.Id, current.Id, StringComparison.Ordinal));
+
+            var hasAccounts = accounts.Count > 0;
+            AccountComboBox.Visibility = hasAccounts ? Visibility.Visible : Visibility.Collapsed;
+            NoAccountText.Visibility = hasAccounts ? Visibility.Collapsed : Visibility.Visible;
+            RemoveAccountButton.IsEnabled = current is not null;
+        }
+        finally
+        {
+            _accountsInitialized = wasInitialized;
+        }
+
+        UpdateStatusSummary();
+    }
+
+    private void AccountComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_accountsInitialized || AccountComboBox.SelectedItem is not Account account)
+        {
+            return;
+        }
+
+        if (string.Equals(_host.Accounts.Current?.Id, account.Id, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        if (!_host.Accounts.TrySetCurrent(account.Id, out var error))
+        {
+            _host.Log.Warn(error ?? "切换账号失败。");
+            RefreshAccounts();
+            return;
+        }
+
+        UpdateStatusSummary();
+    }
+
+    private void AddAccount_Click(object sender, RoutedEventArgs e)
+    {
+        var window = new AddAccountWindow(_host)
+        {
+            Owner = this,
+        };
+
+        if (window.ShowDialog() == true)
+        {
+            RefreshAccounts();
+        }
+    }
+
+    private void RemoveAccount_Click(object sender, RoutedEventArgs e)
+    {
+        var current = _host.Accounts.Current;
+        if (current is null)
+        {
+            return;
+        }
+
+        var result = MessageBox.Show(
+            this,
+            $"确定删除账号“{current.Name}”吗？",
+            "删除账号",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+
+        if (result != MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        if (!_host.Accounts.TryRemove(current.Id, out var error))
+        {
+            MessageBox.Show(
+                this,
+                error ?? "删除账号失败。",
+                "删除账号",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            return;
+        }
+
+        _host.Log.Info($"已删除账号：{current.Name}（{current.FormattedUuid}）");
+        RefreshAccounts();
     }
 
     private void OpenSettings_Click(object sender, RoutedEventArgs e)
@@ -98,9 +212,10 @@ public partial class MainWindow : Window
         }
 
         var memory = settings.AutoMemory ? _host.Memory.GetRecommendedMemoryMb() : settings.MemoryMb;
+        var account = _host.Accounts.Current?.DisplayName ?? "未登录";
 
-        StatusText.Text = $"游戏目录：{directory}    |    Java：{java}    |    内存：{memory} MB";
-        StatusText.ToolTip = $"游戏目录：{directory}\nJava：{(string.IsNullOrWhiteSpace(settings.JavaPath) ? "自动" : settings.JavaPath)}";
+        StatusText.Text = $"账号：{account}    |    游戏目录：{directory}    |    Java：{java}    |    内存：{memory} MB";
+        StatusText.ToolTip = $"账号：{account}\n游戏目录：{directory}\nJava：{(string.IsNullOrWhiteSpace(settings.JavaPath) ? "自动" : settings.JavaPath)}";
     }
 
     private void ClearLog_Click(object sender, RoutedEventArgs e)
