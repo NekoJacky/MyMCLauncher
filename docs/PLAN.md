@@ -1,7 +1,7 @@
 # MyMCLauncher 开发规划文档
 
-> 版本：v0.6
-> 状态：M1 进行中（P0、P1 已完成）
+> 版本：v0.7
+> 状态：M1 进行中（P0、P1、P2 已完成）
 > 范围：M1 启动功能（正版/离线登录、游戏目录选择、启动本地已安装版本）
 > 配套文档：`docs/M1-WORKFLOW.md`（M1 实施流程规划）
 > 登录方案：系统浏览器 + 本地回环（默认），WebView2 兜底
@@ -15,12 +15,12 @@
 | 项目类型 | WPF 桌面应用（`WinExe`） |
 | 目标框架 | `net10.0-windows` |
 | 语言特性 | C#、`Nullable`、`ImplicitUsings` 开启 |
-| 现有文件 | WPF 入口 + `Models/`、`Services/`（AppPaths / JsonStore / LogService / AppHost / Settings / Java）+ `Views/` + `docs/` |
+| 现有文件 | WPF 入口 + `Models/`、`Services/`（AppPaths / JsonStore / LogService / AppHost / Settings / Java / Auth）+ `Views/` + `docs/` |
 | 开发环境 | .NET SDK 10.0.401，WebView2 Runtime 已安装 |
 | 本地 Minecraft | `%APPDATA%\.minecraft` 仅有 `runtime`（无 `versions`/`assets`/`libraries`） |
 | 本地 Java | 无全局 Java；仅有 Mojang 运行时 `runtime/java-runtime-epsilon`（OpenJDK 25） |
 
-**结论**：P0、P1 已完成，进入 P2（离线账号与账号管理）。
+**结论**：P0、P1、P2 已完成，进入 P3（版本扫描与继承解析）。
 
 ---
 
@@ -131,12 +131,14 @@ MyMCLauncher/
 
 ### 4.3 账号系统
 
+> P2 已完成离线账号、账号管理与 DPAPI 存储；微软登录（§4.3.2）仍待 P6。
+
 #### 4.3.1 离线登录
 
-- [ ] 用户名输入与校验（长度、非空、不允许空白）
-- [ ] 生成离线 UUID：`MD5("OfflinePlayer:" + name)` → version‑3 UUID
-- [ ] 构造离线会话：`accessToken="0"`、`userType="legacy"`、`xuid="0"`
-- [ ] 账号持久化
+- [x] 用户名输入与校验（长度、非空、不允许空白）
+- [x] 生成离线 UUID：`MD5("OfflinePlayer:" + name)` → version‑3 UUID
+- [x] 构造离线会话：`accessToken="0"`、`userType="legacy"`、`xuid="0"`
+- [x] 账号持久化
 
 #### 4.3.2 微软正版登录
 
@@ -160,8 +162,8 @@ MyMCLauncher/
   - 地区不支持（`2148916235`）
   - 儿童/家庭账号（`2148916238`）
   - 网络错误、回环失败、WebView2 运行时缺失（兜底）
-- [ ] 账号管理：列表、切换、删除、记住上次账号
-- [ ] 敏感字段 DPAPI 加密存储（`CurrentUser` 范围）
+- [x] 账号管理：列表、切换、删除、记住上次账号（P2 完成）
+- [x] 敏感字段 DPAPI 加密存储（`CurrentUser` 范围，P2 完成）
 
 ### 4.4 版本管理（仅本地读取）
 
@@ -223,7 +225,7 @@ MyMCLauncher/
 
 M1 按 8 个阶段推进，每个阶段要求「可构建、可验证、可回退」。详细拆解见 `docs/M1-WORKFLOW.md`；阶段细化文档：P0 → `docs/P0-FOUNDATION.md`，P1 → `docs/P1-SETTINGS-JAVA.md`，P2 → `docs/P2-ACCOUNTS.md`。
 
-> 进度：P0、P1 已完成，P2 未开始。
+> 进度：P0、P1、P2 已完成，P3 未开始。
 
 | 阶段 | 内容 | 主要产出 | 对应任务 | 依赖 |
 |------|------|----------|----------|------|

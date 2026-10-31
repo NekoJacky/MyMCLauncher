@@ -169,18 +169,20 @@ P0 工程骨架
 
 **前置**：P0、P1（需要配置目录）。
 
+> 状态：已完成（`feat/p2-offline-accounts`，待合并）。
+
 **任务**
 
-- [ ] `Account` 模型（含 `type`、`name`、`uuid`、token、`xuid` 等）
-- [ ] `OfflineAuthService`：
-  - [ ] 用户名校验
-  - [ ] 离线 UUID 生成（`MD5("OfflinePlayer:" + name)`，version‑3）
-  - [ ] 构造离线会话字段
-- [ ] `AccountService`：加载/保存/添加/删除/当前账号
-- [ ] DPAPI 加密敏感字段（`ProtectedData`，`CurrentUser`）
-- [ ] 添加账号窗口（离线部分）
-- [ ] 主窗口账号切换 UI
-- [ ] 记住上次账号
+- [x] `Account` 模型（含 `type`、`name`、`uuid`、token、`xuid` 等）
+- [x] `OfflineAuthService`：
+  - [x] 用户名校验
+  - [x] 离线 UUID 生成（`MD5("OfflinePlayer:" + name)`，version‑3）
+  - [x] 构造离线会话字段
+- [x] `AccountService`：加载/保存/添加/删除/当前账号
+- [x] DPAPI 加密敏感字段（`ProtectedData`，`CurrentUser`）
+- [x] 添加账号窗口（离线部分）
+- [x] 主窗口账号切换 UI
+- [x] 记住上次账号
 
 **产出**：可添加离线账号并在主界面切换。
 
@@ -533,7 +535,7 @@ P0 工程骨架
 
 - [x] P0 工程骨架与基础设施
 - [x] P1 设置、游戏目录、Java 检测
-- [ ] P2 离线账号与账号管理
+- [x] P2 离线账号与账号管理
 - [ ] P3 版本扫描与继承解析
 - [ ] P4 启动构建与完整性检查
 - [ ] P5 启动执行与日志（M1‑Alpha）

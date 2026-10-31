@@ -2,7 +2,7 @@
 
 > 阶段：P2
 > 决策状态：已确认
-> 实现状态：未开始
+> 实现状态：已完成（`feat/p2-offline-accounts`，待合并）
 > 前置：P1 已完成并合并（设置、游戏目录、Java 检测）
 > 范围：离线账号模型、离线 UUID、账号加密存储、账号增删切换、当前账号记忆、账号 UI
 > 非目标：微软正版登录（P6）、皮肤/披风拉取、账号重命名、多账号同时在线
@@ -478,13 +478,13 @@ AppHost
 
 ## 10. 任务拆解与提交计划
 
-| # | 内容 | 提交信息建议 |
-|---|------|--------------|
-| 1 | `Account` / `AccountType` / `OfflineAuthService` + UUID 测试向量 | `feat(P2): add account models and offline UUID` |
-| 2 | `SecretProtector` + `AccountStore` + 加密 DTO | `feat(P2): add encrypted account storage` |
-| 3 | `AccountService` + AppHost 注册 + 设置联动 | `feat(P2): add account service and current account` |
-| 4 | `AddAccountWindow` + 主窗口账号栏/状态栏 | `feat(P2): add account UI` |
-| 5 | 文档勾选与实现记录 | `docs(P2): update progress and notes` |
+| # | 内容 | 提交信息建议 | 状态 |
+|---|------|--------------|------|
+| 1 | `Account` / `AccountType` / `OfflineAuthService` + UUID 测试向量 | `feat(P2): add account models and offline UUID` | 已完成 |
+| 2 | `SecretProtector` + `AccountStore` + 加密 DTO | `feat(P2): add encrypted account storage` | 已完成 |
+| 3 | `AccountService` + AppHost 注册 + 设置联动 | `feat(P2): add account service and current account` | 已完成 |
+| 4 | `AddAccountWindow` + 主窗口账号栏/状态栏 | `feat(P2): add account UI` | 已完成 |
+| 5 | 文档勾选与实现记录 | `docs(P2): update progress and notes` | 本次提交 |
 
 建议分支：`feat/p2-offline-accounts`（阶段内按任务提交，阶段结束统一 PR）。
 
@@ -522,6 +522,8 @@ AppHost
 - `SecretProtector`：加解密往返、空字符串、篡改 Base64 失败
 - `AccountStore`：保存/加载往返、损坏文件、token 非明文、解密失败回退
 - `AccountService`：添加、重复、删除当前、切换、保存失败回滚、重启恢复
+
+> 未建立 xUnit 项目；以上用例通过临时控制台与 WPF 冒烟测试验证。
 
 ### 12.2 手工测试
 
@@ -573,3 +575,32 @@ AppHost
 8. 添加账号窗口包含微软登录占位
 9. `dotnet build` 0 error
 10. 文档更新并记录实现差异
+
+---
+
+## 15. 实现记录
+
+### 15.1 提交
+
+| 提交 | 内容 |
+|------|------|
+| `6c38e9c` | 账号模型与离线 UUID |
+| `1e2fed6` | 加密账号存储 |
+| `fde3fb5` | 账号服务与当前账号 |
+| `e5021c8` | 账号 UI |
+| 本次提交 | 文档更新 |
+
+### 15.2 与设计的差异
+
+- 未建立 xUnit 项目；使用临时控制台与 WPF 冒烟测试验证
+- 离线 token 存储为空，由 `EffectiveAccessToken` 映射为 `"0"`
+- 重复用户名仅提示错误，不自动切换到已有账号
+- 账号保存失败时回滚列表；设置保存失败时记录警告
+
+### 15.3 验证结果
+
+- UUID：`Notch` / `Steve` / `Alex` / `test_user` 与 Java 25 结果一致
+- DPAPI：加解密往返成功；篡改 token 解密失败并清空
+- `accounts.json`：token 无明文；损坏文件生成 `.corrupt-*` 备份
+- 账号：添加、重复、切换、删除、重启恢复均通过
+- UI：`MainWindow` + `AddAccountWindow` 冒烟通过
